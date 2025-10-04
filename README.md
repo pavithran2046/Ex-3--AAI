@@ -1,7 +1,7 @@
-<H3>ENTER YOUR NAME</H3>
-<H3>ENTER YOUR REGISTER NO.</H3>
+<H3>NAME:PAVITHRAN S</H3>
+<H3>REGISTER NO:212223240113</H3>
 <H3>EX. NO.3</H3>
-<H3>DATE:</H3>
+<H3>DATE:30-09-2025</H3>
 <H1 ALIGN =CENTER> Implementation of Approximate Inference in Bayesian Networks
 </H1>
 
@@ -35,12 +35,65 @@
 
 
 ## Program:
-Insert your code here
+```
+from pgmpy.models import BayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+from pgmpy.sampling import GibbsSampling
+
+model = BayesianNetwork([('Rain', 'Traffic'), ('Accident', 'Traffic')])
+cpd_rain = TabularCPD(variable='Rain', variable_card=2, values=[[0.7], [0.3]])  # 0: No rain, 1: Rain
+cpd_accident = TabularCPD(variable='Accident', variable_card=2, values=[[0.9], [0.1]])  # 0: No accident, 1: Accident
+
+cpd_traffic = TabularCPD(
+    variable='Traffic',
+    variable_card=2,
+    values=[
+        [0.9, 0.6, 0.7, 0.1],   # Traffic = No
+        [0.1, 0.4, 0.3, 0.9]    # Traffic = Yes
+    ],
+    evidence=['Rain', 'Accident'],
+    evidence_card=[2, 2]
+)
+
+model.add_cpds(cpd_rain, cpd_accident, cpd_traffic)
+
+assert model.check_model()
+
+print("Bayesian Network Structure:")
+print(model.edges())
+import networkx as nx
+import matplotlib.pyplot as plt
+
+G = nx.DiGraph()
+G.add_nodes_from(['Rain', 'Accident', 'Traffic'])
+G.add_edges_from([('Rain', 'Traffic'), ('Accident', 'Traffic')])
+
+pos = nx.spring_layout(G)  # node positions
+nx.draw(G, pos, with_labels=True, node_size=3000, node_color="skyblue", arrowsize=20, font_size=12)
+plt.title("Bayesian Network Structure")
+plt.show()
+
+gibbs = GibbsSampling(model)
+
+num_samples = 5000
+samples = gibbs.sample(size=num_samples)
+
+
+query_variable = 'Traffic'
+approx_probs = samples[query_variable].value_counts(normalize=True)
+
+
+print(f"\nApproximate probabilities for {query_variable}:")
+print(approx_probs)
+```
 
 
 
 ## Output:
-<Show your results>
+<img width="805" height="633" alt="image" src="https://github.com/user-attachments/assets/b2531508-cf26-4a42-9a6c-e91c06ea1cf8" />
+
+<img width="356" height="119" alt="image" src="https://github.com/user-attachments/assets/5b8d2c56-9bdc-43a8-8f95-151d140abdea" />
+
 
 ## Result:
 Thus, Gibb's Sampling( Approximate Inference method) is succuessfully implemented using python.
